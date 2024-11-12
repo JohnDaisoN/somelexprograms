@@ -1,0 +1,15 @@
+%{
+#include <stdio.h>
+%}
+
+%%
+"<"[^>]*">"     { /* Match HTML tags and ignore them */ }
+[^<\n]+         { printf("%s", yytext); } /* Print text outside of tags */
+\n              { printf("\n"); } /* Preserve new lines */
+%%
+
+int main() {
+    printf("Enter HTML content (Press Ctrl+D to end input):\n");
+    yylex();  /* Run the lexical analyzer */
+    return 0;
+}
