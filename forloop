@@ -1,0 +1,29 @@
+%{
+#include <stdio.h>
+int is_valid = 1; // Flag to check if the input is a valid 'for' loop
+%}
+
+%%
+"for"[\t ]*"("[\t ]*            { /* Match 'for (' with optional spaces */ }
+[a-zA-Z_][a-zA-Z0-9_]*[\t ]*=[\t ]*[a-zA-Z0-9]+[\t ]*";" { /* Match initialization */ }
+[\t ]*[a-zA-Z_][a-zA-Z0-9_]*[\t ]*([<>=!]=?|&&|\|\|)[\t ]*[a-zA-Z0-9]+[\t ]*";" { /* Match condition */ }
+[\t ]*[a-zA-Z_][a-zA-Z0-9_]*([\+\-\*/]=|[+\-]{2}|[+\-*/])[\t ]*[a-zA-Z0-9_]*[\t ]*")" { /* Match increment */ }
+[\t ]*[{]?[\t ]*                { /* Match optional '{' to open the body */ }
+.                               { is_valid = 0; /* Mark as invalid if any other character appears */ }
+
+%%
+
+int main() {
+    printf("Enter a line of code to check for 'for' loop syntax:\n");
+
+    // Run the lexical analyzer
+    yylex();
+
+    if (is_valid) {
+        printf("Valid 'for' loop syntax.\n");
+    } else {
+        printf("Invalid 'for' loop syntax.\n");
+    }
+
+    return 0;
+}
