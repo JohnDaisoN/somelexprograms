@@ -1,0 +1,65 @@
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+#define STACK_SIZE 100
+
+int stack[STACK_SIZE];
+int top = -1;
+
+void push(int value) {
+    if (top >= STACK_SIZE - 1) {
+        fprintf(stderr, "Stack overflow\n");
+        exit(1);
+    }
+    stack[++top] = value;
+}
+
+int pop() {
+    if (top < 0) {
+        fprintf(stderr, "Stack underflow\n");
+        exit(1);
+    }
+    return stack[top--];
+}
+
+%}
+
+%%
+
+[0-9]+       { /* Match numbers */
+                int num = atoi(yytext);
+                push(num); 
+              }
+
+"+"          { int b = pop(); int a = pop(); push(a + b); } /* Addition */
+"-"          { int b = pop(); int a = pop(); push(a - b); } /* Subtraction */
+"*"          { int b = pop(); int a = pop(); push(a * b); } /* Multiplication */
+"/"          { int b = pop(); int a = pop(); 
+                if (b == 0) {
+                    fprintf(stderr, "Division by zero error\n");
+                    exit(1);
+                }
+                push(a / b); 
+              }
+
+[ \t\n]+     { /* Ignore whitespace */ }
+
+.            { fprintf(stderr, "Invalid character: %s\n", yytext); exit(1); }
+
+%%
+
+int main() {
+    printf("Enter a postfix expression: ");
+    
+    yylex();  /* Run the lexical analyzer */
+
+    if (top == 0) {  /* The final result should be the only item on the stack */
+        printf("Result: %d\n", pop());
+    } else {
+        fprintf(stderr, "Invalid postfix expression\n");
+    }
+
+    return 0;
+}
